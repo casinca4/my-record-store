@@ -1,0 +1,67 @@
+{
+  "records": [
+    {
+      "name": "Babylon",
+      "id": "1572530583677"
+    },
+    {
+      "name": "Babylon2",
+      "id": "1572530652717"
+    }
+  ],
+  "users": [
+    {
+      "id": "1572533085394"
+    },
+    {
+      "firstName": "Peter",
+      "lastName": "Schulz",
+      "userName": "Pi",
+      "e-mail": "peter.schulz@gmail.com",
+      "id": "1572533249453"
+    },
+    {
+      "firstName": "Peter",
+      "lastName": "Schulz",
+      "userName": "Pi",
+      "e-mail": "peter.schulz@gmail.com",
+      "id": "1573029795596"
+    },
+    {
+      "firstName": "Peter",
+      "lastName": "Schulz",
+      "userName": "Pi",
+      "e-mail": "peter.schulz@gmail.com",
+      "birthday": "6.11.1986",
+      "id": "1573029905440"
+    },
+    {
+      "firstName": "Peter",
+      "lastName": "Schulz",
+      "userName": "Pi",
+      "e-mail": "peter.schulz@gmail.com",
+      "password": "Piit",
+      "birthday": "6.11.1986",
+      "id": "1573030070671"
+    },
+    {
+      "firstName": "Peter",
+      "lastName": "Schulz",
+      "userName": "Pi",
+      "e-mail": "peter.schulz@gmail.com",
+      "password": "Piit",
+      "birthday": "6.11.1986",
+      "id": "1573033639192"
+    }
+  ],
+  "orders": [
+    {
+      "date": "23.4.1989",
+      "records": {
+        "price": 9.99,
+        "record_id": 39485
+      },
+      "id": "1572534553537"
+    }
+  ]
+}
