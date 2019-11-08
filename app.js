@@ -12,7 +12,7 @@ const FileSync = require('lowdb/adapters/FileSync');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
-const recordsRouter = require('./routes/records');      //haben wir hinzugefügt
+const recordsRouter = require('./routes/records');     
 const ordersRouter = require('./routes/orders');
 
 
@@ -34,12 +34,12 @@ const db = low(adapter);
 db.defaults({ records: [], users: [], orders: [] }).write();        //das geht zu db eine Zeile darüber, adapter zu db.json; deswegen infinite loop, wenn in db.json nicht verhindert in start
 
 
-/** REQUEST PARSERS */
-//runs every time
+/** REQUEST PARSERS */  
+//runs every time           sind middleware functions
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(setCors);
+app.use(setCors);           //wenn hier error, geht es trotzdem weiter; man braucht extra middleware function
 
 
 /** STATIC FILES */
@@ -49,8 +49,29 @@ app.use(express.static(path.join(__dirname, 'public')));
 /** ROUTES */
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/records', recordsRouter);              //haben wir hinzugefügt
+app.use('/records', recordsRouter);              
 app.use('/orders', ordersRouter);
+
+
+/** ERROR HANDLING */
+/* wenn hier in Datei was falsch ist, wird diese Funktion angewendet; z. B. const usersRouter = require('./routes/users'); man gibt in Adresse usersklj ein; geht also chronologisch; wir haben bis jetzt nichts anderes programmiert
+object inside an object: Antwort wird immer res.data.error sein und nicht res.data.message; deswegen nicht message: ...
+*/
+
+app.use(function(req, res, next) {
+    const err = new Error('Looks like something is broken...');     //err könnte auch anders heißen und unten in der Funktion trotzdem err; er erkennt das
+    next(err);
+});
+
+app.use(function(err, req, res, next) {
+    res.status(400).send({
+        error: {
+            message: err.message
+        }
+    });
+});
+
+
 
 module.exports = app;
 
