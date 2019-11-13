@@ -54,6 +54,6 @@ exports.getOrders = (req, res, next) => {       //exports is object
     res.status(200).send(order);
   };
 
-  console.log(exports);     //{ getOrders: [Function], addOrder: [Function] }
+  // console.log(exports);     //{ getOrders: [Function], addOrder: [Function] }
 
   

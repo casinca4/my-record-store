@@ -6,7 +6,7 @@ const { getOrders,
     deleteOrder,
     updateOrder
 } = require('../controllers/ordersController'); //{} bezieht sich ordersController.js    
-console.log(require('../controllers/ordersController'));    // { getOrders: [Function], addOrder: [Function] }  key, key = key value, key value
+// console.log(require('../controllers/ordersController'));    // { getOrders: [Function], addOrder: [Function] }  key, key = key value, key value
 // require controllers = getOrders
 
 

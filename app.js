@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
+const mongoose = require('mongoose');
 
 
 /** ROUTERS */
@@ -28,7 +29,28 @@ const app = express();
 app.use(logger('dev'));
 
 
-/** SET UP LOWDB */             //Anweisungen von github lowdb
+/** CONNECT TO MONGO */
+mongoose.connect('mongodb://localhost:27017/MyRecordStore', {       //27017 sieht man in mongo compass ind localhost; MyRecordStore oder irgendein anderer Name, ist Name der Datenbank
+  useNewUrlParser: true,                        //die drei Zeilen kamen als Info im Terminal, wenn sie auskommentiert sind
+  useCreateIndex: true,
+  useUnifiedTopology: true
+});
+
+mongoose.connection.on(
+  'error',
+  console.error.bind(console, 'connection error:')
+);
+
+mongoose.connection.on('open', () => {
+  console.log(`Connected to the database...`);
+});
+
+//Anweisungen von hier: https://mongoosejs.com/docs/index.html
+
+
+
+
+/** SET UP LOWDB */             //Anweisungen von github lowdb; lowdb gibt es bald nicht mehr
 const adapter = new FileSync('data/db.json');           //diese und nächste Zeile: connects things together
 const db = low(adapter);
 db.defaults({ records: [], users: [], orders: [] }).write();        //das geht zu db eine Zeile darüber, adapter zu db.json; deswegen infinite loop, wenn in db.json nicht verhindert in start
