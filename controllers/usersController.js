@@ -4,30 +4,17 @@ const createError = require('http-errors');
 exports.getUsers = async (req, res, next) => {      //await immer mit async; mit try und catch; req ist nicht notwendig
   // const users = db.get('users').value();
   try {
-    const users = await User.find();        //talking to the db, da model User; find will never fail, höchstens empty array
+    const users = await User.find();        //talking to the db (mongoose), da model User; find will never fail, höchstens empty array
     res.status(200).send(users);
   } catch (e) {                   //wenn Fehler
     next(e);                      //something went wrong; geht zur nächsten; oder ohne e; geht zur app.js error handling
   }
 };
 
-
-exports.addUser = async (req, res, next) => {
-  const user = req.body;
-  try {
-    const user = new User(req.body);     //req.body entspricht data
-    await user.save();
-    res.status(200).send(user);
-  } catch (e) {
-    next();
-  }
-};
-
 //nicht low db, sondern mongoose
 exports.getUser = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const user = await User.findById(id);   //in db gucken
+    try {
+    const user = await User.findById(req.params.id);   //in db gucken
     if (!user) throw new createError.NotFound();
     res.status(200).send(user);
   } catch (e) {
@@ -54,5 +41,15 @@ exports.updateUser = async (req, res, next) => {
     res.status(200).send(user);
   } catch (e) {
     next(e);
+  }
+};
+
+exports.addUser = async (req, res, next) => {
+  try {
+    const user = new User(req.body);     //req.body entspricht data
+    await user.save();
+    res.status(200).send(user);
+  } catch (e) {
+    next();
   }
 };

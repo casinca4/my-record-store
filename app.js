@@ -4,8 +4,6 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
 const mongoose = require('mongoose');
 
 
@@ -13,7 +11,7 @@ const mongoose = require('mongoose');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
-const recordsRouter = require('./routes/records');     
+const recordsRouter = require('./routes/records');
 const ordersRouter = require('./routes/orders');
 
 
@@ -48,15 +46,7 @@ mongoose.connection.on('open', () => {
 //Anweisungen von hier: https://mongoosejs.com/docs/index.html
 
 
-
-
-/** SET UP LOWDB */             //Anweisungen von github lowdb; lowdb gibt es bald nicht mehr
-const adapter = new FileSync('data/db.json');           //diese und nächste Zeile: connects things together
-const db = low(adapter);
-db.defaults({ records: [], users: [], orders: [] }).write();        //das geht zu db eine Zeile darüber, adapter zu db.json; deswegen infinite loop, wenn in db.json nicht verhindert in start
-
-
-/** REQUEST PARSERS */  
+/** REQUEST PARSERS */
 //runs every time           sind middleware functions
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -82,17 +72,17 @@ app.use('/orders', ordersRouter);
 object inside an object: Antwort wird immer res.data.error sein und nicht res.data.message; deswegen nicht message: ...
 */
 
-app.use(function(req, res, next) {    //next talks to all middleware function, s. ROUTES and calls the next one
-    const err = new Error('Looks like something is broken...');     //err könnte auch anders heißen und unten in der Funktion trotzdem err; er erkennt das
-    next(err);            //geht zur nächsten function dadrunter
+app.use(function (req, res, next) {    //next talks to all middleware function, s. ROUTES and calls the next one
+  const err = new Error('Looks like something is broken...');     //err könnte auch anders heißen und unten in der Funktion trotzdem err; er erkennt das
+  next(err);            //geht zur nächsten function dadrunter
 });
 
-app.use(function(err, req, res, next) {
-    res.status(400).send({
-        error: {
-            message: err.message                  //message: 'Looks like something is broken...'
-        }
-    });
+app.use(function (err, req, res, next) {
+  res.status(400).send({
+    error: {
+      message: err.message                  //message: 'Looks like something is broken...'
+    }
+  });
 });
 
 
