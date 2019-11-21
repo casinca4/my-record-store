@@ -71,8 +71,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 /** ROUTES */
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/records', recordsRouter);              
+app.use('/records', recordsRouter);       //we point people to the pointer recordsRouter          
 app.use('/orders', ordersRouter);
+
+//wenn alles gut ist, geht es einen WEg; wenn irgendwas falsch ist in Router, controller oder so, dann geh zur nächsten middleware function, s. error handling
 
 
 /** ERROR HANDLING */
@@ -80,15 +82,15 @@ app.use('/orders', ordersRouter);
 object inside an object: Antwort wird immer res.data.error sein und nicht res.data.message; deswegen nicht message: ...
 */
 
-app.use(function(req, res, next) {
+app.use(function(req, res, next) {    //next talks to all middleware function, s. ROUTES and calls the next one
     const err = new Error('Looks like something is broken...');     //err könnte auch anders heißen und unten in der Funktion trotzdem err; er erkennt das
-    next(err);
+    next(err);            //geht zur nächsten function dadrunter
 });
 
 app.use(function(err, req, res, next) {
     res.status(400).send({
         error: {
-            message: err.message
+            message: err.message                  //message: 'Looks like something is broken...'
         }
     });
 });

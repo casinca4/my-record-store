@@ -3,6 +3,7 @@
  //das gleiche: 
  //  var Schema = mongoose.Schema;
 
+ //Schema
 
  const UserSchema = new Schema ({
      firstName: {
@@ -27,7 +28,8 @@
      },
      userName: {
          type: String,
-         required: true
+         required: true,
+         unique: true
      }
  });
 

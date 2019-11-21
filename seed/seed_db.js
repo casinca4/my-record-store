@@ -33,7 +33,7 @@ const User = require('../models/User');         //model is wie class, schema is 
 
     try {
         // await Promise.all(userPromises);
-        await User.deleteMany({});
+        await User.deleteMany({});                              //User groß, da vom model
         // console.log('Users stored in the database!')
         console.log('Old users moved to a better place. Spandau')
     } catch (e) {
@@ -55,7 +55,7 @@ const User = require('../models/User');         //model is wie class, schema is 
                 birthday: faker.date.past(),
                 userName: faker.internet.userName()
             });
-            return user.save();                     //save: returns a promise
+            return user.save();                     //save: Please save this; returns a promise
         });
 
     // console.log(userPromises);

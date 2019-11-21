@@ -1,59 +1,60 @@
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync('data/db.json');          
-const db = low(adapter);
+const Order = require('../models/Order');
+const createError = require('http-errors');
 
 
-exports.getOrders = (req, res, next) => {       //exports is object
-    const orders = db.get('orders').value();
+exports.getOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find();
     res.status(200).send(orders);
-  };
-  
-  exports.addOrder = (req, res, next) => {
-    const order = req.body;                        //body: die Daten, die wir in postman in body eingegeben haben; record ist willkürlich gewählt, nicht wg. postman
-    db.get('orders')
-      .push(order)
-      .last()
-      .assign({ id: Date.now().toString() })
-      .write();
-  
-    res.status(200).send(order);
-  };
+  } catch (e) {
+    next(e);
+  }
+};
 
-  
-  exports.getOrder = (req, res, next) => {
-    const { id } = req.params;
-    const order = db
-      .get('orders')
-      .find({ id })
-      .value();
-  
+exports.addOrder = async (req, res, next) => {
+  const order = req.body;
+  try {
+    const order = new Order(req.body);
+    await order.save();
     res.status(200).send(order);
-  };
-  
-  exports.deleteOrder = (req, res, next) => {
+  } catch (e) {
+    next();
+  }
+};
+
+
+exports.getOrder = async (req, res, next) => {
+  try {
     const { id } = req.params;
-    const order = db
-      .get('orders')
-      .remove({ id })
-      .write();
-  
+    const order = await Order.findById(id);
+    if (!order) throw new createError.NotFound();
     res.status(200).send(order);
-  };
-  
-  exports.updateOrder = (req, res, next) => {
-    const { id } = req.params;
-    const data = req.body;
-  
-    const order = db
-      .get('orders')
-      .find({ id })
-      .assign(data)
-      .write();
-  
+  } catch (e) {
+    next();
+  }
+};
+
+exports.deleteOrder = async (req, res, next) => {
+  try {
+    const order = await Order.findByIdAndDelete(req.params.id);
+    if (!order) throw new createError.NotFound();
     res.status(200).send(order);
-  };
+  } catch (e) {
+    next(e);
+  }
+};
+
+exports.updateOrder = async (req, res, next) => {
+  try {
+    const order = await Order.findByIdAndUpdate(req.params.id, req.body, {
+      new: true                                       //2.: was wir updaten möchten
+    });
+    if (!order) throw new createError.NotFound();
+    res.status(200).send(order);
+  } catch (e) {
+    next(e);
+  }
+};
 
   // console.log(exports);     //{ getOrders: [Function], addOrder: [Function] }
 
-  
