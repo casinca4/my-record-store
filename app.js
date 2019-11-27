@@ -98,3 +98,8 @@ records: router.route('/')      // / = records (local)
 recordsController       find ({id: id}) ... 2. id ist von const {id}        find ist fake object
 find an object that has an ID of 25, wenn const id = 25    const record = db .get ... .find ({id}) --> id : id
 */
+
+
+
+//https://mongoosejs.com/docs/populate.html#populate-virtuals   für populate
+//https://mongoosejs.com/docs/guide.html      für virtual

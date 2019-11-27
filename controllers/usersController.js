@@ -5,6 +5,9 @@ exports.getUsers = async (req, res, next) => {      //await immer mit async; mit
   // const users = db.get('users').value();
   try {
     const users = await User.find();        //talking to the db (mongoose), da model User; find will never fail, höchstens empty array
+    .select('-password -__v')
+    .sort('lastName')
+    .limit(5);
     res.status(200).send(users);
   } catch (e) {                   //wenn Fehler
     next(e);                      //something went wrong; geht zur nächsten; oder ohne e; geht zur app.js error handling
@@ -33,9 +36,11 @@ exports.deleteUser = async (req, res, next) => {
 };
 
 exports.updateUser = async (req, res, next) => {
+  console.log(req.body);
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {    //params: bei postman http://localhost:3000/users
-      new: true                                       //2.: was wir updaten möchten
+      new: true,                                      //2.: was wir updaten möchten
+      runValidators: true                         //aus monggose documentation
     });
     if (!user) throw new createError.NotFound();
     res.status(200).send(user);
@@ -53,3 +58,5 @@ exports.addUser = async (req, res, next) => {
     next();
   }
 };
+
+//new true: return the updated document 

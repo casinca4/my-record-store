@@ -1,32 +1,19 @@
 const Order = require('../models/Order');
 const createError = require('http-errors');
 
-
 exports.getOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find();
+    const orders = await Order.find().populate('records', ' -__v');   //v wird nicht angezeigt
     res.status(200).send(orders);
   } catch (e) {
     next(e);
   }
 };
 
-exports.addOrder = async (req, res, next) => {
-  const order = req.body;
-  try {
-    const order = new Order(req.body);
-    await order.save();
-    res.status(200).send(order);
-  } catch (e) {
-    next();
-  }
-};
-
-
 exports.getOrder = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const order = await Order.findById(id);
+    const order = await Order.findById(req.params.id).populate('records');
+    // const { id } = req.params;
     if (!order) throw new createError.NotFound();
     res.status(200).send(order);
   } catch (e) {
@@ -55,6 +42,18 @@ exports.updateOrder = async (req, res, next) => {
     next(e);
   }
 };
+
+exports.addOrder = async (req, res, next) => {
+  try {
+    const order = new Order(req.body);
+    await order.save();
+    res.status(200).send(order);
+  } catch (e) {
+    next();
+  }
+};
+
+
 
   // console.log(exports);     //{ getOrders: [Function], addOrder: [Function] }
 
