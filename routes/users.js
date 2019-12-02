@@ -21,6 +21,8 @@ router
     .post(userValidationRules(), userValidationErrorHandling, addUser);
 
 
+router.route('/me').get(authenticateUser);          // muß hier stehen, kann nicht über module.exports stehen; man weiß nicht, warum
+
 router
     .route('/:id')
     .get(getUser)
@@ -30,6 +32,7 @@ router
 
 /** POST a new user */
 router.post('/', addUser);
+
 
 
 module.exports = router;

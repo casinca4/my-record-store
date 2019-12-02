@@ -1,8 +1,12 @@
+// mongoose-seed lets you populate and clear MongoDB documents with all the benefits of Mongoose validation
+// populate: lets you reference documents in other collections
 // console.log('I AM A SEED SCRIPT');
 
 const mongoose = require('mongoose');
 const faker = require('faker');
 const User = require('../models/User');         //model is wie class, schema is wie constructor, deswegen großes U
+const Record = require('../models/Record');
+const Order = require('../models/Order');
 
 (async function () {
     /** CONNECT TO MONGO */
@@ -31,6 +35,7 @@ const User = require('../models/User');         //model is wie class, schema is 
     //alte Methode
 
 
+    /* DELETE ALL USERS */
     try {
         // await Promise.all(userPromises);
         await User.deleteMany({});                              //User groß, da vom model
@@ -41,6 +46,26 @@ const User = require('../models/User');         //model is wie class, schema is 
     }
 
 
+    /** DELETE ALL RECORDS */
+    try {
+        await Record.deleteMany({});
+        console.log('Old records moved to a better place. Spandau');
+    } catch (e) {
+        console.log(e);
+    }
+
+
+    /** DELETE ALL ORDERS */
+    try {
+        await Order.deleteMany({});
+        console.log('Old orders moved to a better place. Spandau');
+    } catch (e) {
+        console.log(e);
+    }
+    console.log(`I am creating 20 fake users`);
+
+
+    //CREATE 20 FAKE USERS"
     console.log('I am creating 20 fake users');
 
 
@@ -53,8 +78,13 @@ const User = require('../models/User');         //model is wie class, schema is 
                 email: faker.internet.email(),
                 password: faker.internet.password(),
                 birthday: faker.date.past(),
-                userName: faker.internet.userName()
+                userName: faker.internet.userName(),
+                address: {
+                    city: faker.address.city(),
+                    street: faker.address.streetName()
+                }
             });
+
             return user.save();                     //save: Please save this; returns a promise
         });
 
@@ -63,6 +93,28 @@ const User = require('../models/User');         //model is wie class, schema is 
     try {
         await Promise.all(userPromises);
         console.log('Users stored in the database!');
+    } catch (e) {
+        console.log(e);
+    }
+
+
+    /** CREATE 20 FAKE RECORDS */
+    const recordPromises = Array(20)
+        .fill(null)
+        .map(() => {
+            const record = new Record({
+                title: faker.random.words(),
+                artist: faker.internet.userName(),
+                year: new Date(faker.date.past()).getFullYear(),
+                price: faker.finance.amount()
+            });
+
+            return record.save();
+        });
+
+    try {
+        await Promise.all(recordPromises);
+        console.log('Records stored in the database!');
     } catch (e) {
         console.log(e);
     }

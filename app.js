@@ -1,9 +1,9 @@
 /** EXTERNAL DEPENDENCIES */
 
 const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
+const path = require('path');         // get path of files    z. B. path.name vielleicht; bei static files
+const cookieParser = require('cookie-parser');  // benutzen wir nicht; read cookies wie z. B. read local storage
+const logger = require('morgan');       // for creating logs;  was man im Terminal sieht
 const mongoose = require('mongoose');
 
 
@@ -59,7 +59,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 /** ROUTES */
-app.use('/', indexRouter);
+app.use('/', indexRouter);      // s. oben bei routers
 app.use('/users', usersRouter);
 app.use('/records', recordsRouter);       //we point people to the pointer recordsRouter          
 app.use('/orders', ordersRouter);
@@ -77,6 +77,8 @@ app.use(function (req, res, next) {    //next talks to all middleware function, 
   next(err);            //geht zur nächsten function dadrunter
 });
 
+// warum error hier und nicht unteN???????????????
+
 app.use(function (err, req, res, next) {
   res.status(400).send({
     error: {
@@ -84,7 +86,6 @@ app.use(function (err, req, res, next) {
     }
   });
 });
-
 
 
 module.exports = app;

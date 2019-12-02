@@ -1,13 +1,13 @@
-const User = require('../models/User');       //User groß weil class, ist model
+  const User = require('../models/User');       //User groß weil class, ist model
 const createError = require('http-errors');
 
 exports.getUsers = async (req, res, next) => {      //await immer mit async; mit try und catch; req ist nicht notwendig
   // const users = db.get('users').value();
   try {
-    const users = await User.find();        //talking to the db (mongoose), da model User; find will never fail, höchstens empty array
-    .select('-password -__v')
-    .sort('lastName')
-    .limit(5);
+    const users = await User.find()        //talking to the db (mongoose), da model User; find will never fail, höchstens empty array
+      .select('-password -__v')
+      .sort('lastName')
+      .limit(5);
     res.status(200).send(users);
   } catch (e) {                   //wenn Fehler
     next(e);                      //something went wrong; geht zur nächsten; oder ohne e; geht zur app.js error handling
@@ -16,7 +16,7 @@ exports.getUsers = async (req, res, next) => {      //await immer mit async; mit
 
 //nicht low db, sondern mongoose
 exports.getUser = async (req, res, next) => {
-    try {
+  try {
     const user = await User.findById(req.params.id);   //in db gucken
     if (!user) throw new createError.NotFound();
     res.status(200).send(user);
@@ -40,7 +40,7 @@ exports.updateUser = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {    //params: bei postman http://localhost:3000/users
       new: true,                                      //2.: was wir updaten möchten
-      runValidators: true                         //aus monggose documentation
+      runValidators: true                         //aus mongoose documentation
     });
     if (!user) throw new createError.NotFound();
     res.status(200).send(user);
@@ -52,11 +52,29 @@ exports.updateUser = async (req, res, next) => {
 exports.addUser = async (req, res, next) => {
   try {
     const user = new User(req.body);     //req.body entspricht data
+    const token = user.generateAuthToken();
     await user.save();
-    res.status(200).send(user);
+    res
+    .status(200)
+    .header('x-auth', token)
+    .send(user);   // put token in the header
   } catch (e) {
     next();
   }
 };
+
+exports.authenticateUser = async (req, res, next) => {   // in route in users.js benutzt
+  // console.log(req);
+  try {
+    const token = req.header('x-auth');
+    const user = await User.findByToken(token);
+    if (!user) throw new createError.NotFound();
+    res.send.status(200).send(user);      // wenn authentication geklappt hat; validate auth.
+  } catch (e) {
+    next(e);
+  }
+}
+
+
 
 //new true: return the updated document 
