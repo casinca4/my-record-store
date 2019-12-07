@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const Address = require('./Address');                         //import Schema
+const Address = require('./Address');   // import schema
+const jwt = require('jsonwebtoken');
+const encryption = require('../lib/encryption');
+const env = require('../config/config');
 //das gleiche: 
 //  var Schema = mongoose.Schema;
 
@@ -8,6 +11,7 @@ const Address = require('./Address');                         //import Schema
 
 const UserSchema = new Schema(
   {
+    id: false,
     firstName: {
       type: String,
       required: true
@@ -33,22 +37,15 @@ const UserSchema = new Schema(
       required: true,
       unique: true
     },
+    role: {
+      type: String,
+      enum: ['Admin', 'User'],
+      required: true
+    },
     address: {
       type: Address,
       required: true
-    },
-    tokens: [
-      {
-        access: {
-          type: String,
-          required: true
-        },
-        token: {
-          type: String,
-          required: true
-        }
-      }
-    ]
+    }
   },
   {
     toJSON: {
@@ -71,7 +68,7 @@ UserSchema.methods.generateAuthToken = function () {
   const access = 'x-auth';
 
   const token = jwt
-    .sign({ _id: user._id.toHexString(), access }, 'babylon')   //id muß string sein; babylon: secret key
+    .sign({ _id: user._id.toHexString(), access }, env.jwt_key)   //id muß string sein; babylon: secret key
     .toString;
   // console.log(token);
 
@@ -80,23 +77,39 @@ UserSchema.methods.generateAuthToken = function () {
   //   token                   // token: token
   // });
 
-  user.tokens.push({ access, token });
-  
   return token;
 };
 
+UserSchema.methods.checkPassword = async function (password) {
+  const user = this;
+  return await encryption.compare(password, user.password);
+};
+
+UserSchema.methods.getPublicFields = function () {
+  return {
+    _id: this._id,
+    lastName: this.lastName,
+    firstName: this.firstName,
+    email: this.email,
+    fullName: this.fullName,
+    birthday: new Date(this.birthday),
+    address: this.address
+  };
+};
+
+
 // decode token
-UserSchema.statics.findByToken = function (token) {       // UserSchema has place to write statics methods or methods methods <-- talks to the specific user you are talking to, not to the model
+UserSchema.statics.findByToken = function(token) {    // UserSchema has place to write statics methods or methods methods <-- talks to the specific user you are talking to, not to the model
   const User = this;            // this refers to the model
+  let decoded;
 
   try {
-    const decoded = jwt.verify(token, 'babylon');     // jwt oben benutzt; was gedruckt wird: in ucontrollers
+    decoded = jwt.verify(token, env.jwt_key);   // jwt oben benutzt; was gedruckt wird: in ucontrollers
   } catch (err) {
     return;
-  };
+  }
 
-
-  // return User.findOne({     // returns a promise; auch andere methods, wie find
+   // return User.findOne({     // returns a promise; auch andere methods, wie find
   //   _id: decoded._id,
   //   tokens: [{
   //     token: token,
@@ -106,12 +119,24 @@ UserSchema.statics.findByToken = function (token) {       // UserSchema has plac
 
   //oder so:
 
-  return User.findOne({     // wenn er einen user findet, we get back all the information of the user
-    _id: decoded._id,
-    'tokens.token': token,
-    'tokens.access': decoded.access
+
+  return User.findOne({       // wenn er einen user findet, we get back all the information of the user
+    _id: decoded._id
   });
 };
+
+
+
+ 
+
+
+UserSchema.pre('save', async function (next) {
+  // only hash the password if it has been modified (or is new)
+  if (!this.isModified('password')) return next();
+
+  this.password = await encryption.encrypt(this.password);     // this: schema
+  next();
+});
 
 module.exports = mongoose.model('User', UserSchema);        //User should contain UserSchema
 

@@ -8,6 +8,7 @@ const { getOrders,
 } = require('../controllers/ordersController'); //{} bezieht sich ordersController.js    
 // console.log(require('../controllers/ordersController'));    // { getOrders: [Function], addOrder: [Function] }  key, key = key value, key value
 // require controllers = getOrders
+const auth = require('../middleware/authenticator');
 
 
 
@@ -17,14 +18,14 @@ const { getOrders,
 /** GET all the orders */
 router
     .route('/')
-    .get(getOrders)
-    .post(addOrder)
+    .get(auth, getOrders)
+    .post(auth, addOrder)
 
 router
     .route('/:id')
-    .get(getOrder)
-    .delete(deleteOrder)
-    .put(updateOrder);
+    .get(auth, getOrder)
+    .delete(auth, deleteOrder)
+    .put(auth, updateOrder);
 
 /** POST a new order */
 router.post('/', addOrder);

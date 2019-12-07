@@ -1,3 +1,5 @@
+// all das ist Standard
+
 /** EXTERNAL DEPENDENCIES */
 
 const express = require('express');
@@ -8,6 +10,8 @@ const mongoose = require('mongoose');
 
 
 /** ROUTERS */
+//  A router object is an isolated instance of middleware and routes. You can think of it as a “mini-application,” capable only of performing middleware and routing functions. Every Express application has a built-in app router.
+// http://expressjs.com/de/4x/api.html#router
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -16,7 +20,8 @@ const ordersRouter = require('./routes/orders');
 
 
 /** OUR MIDDLEWARE */
-const { setCors } = require('./middleware/security');
+const { setCors } = require('./middleware/security');   // cross origin request.... request that come from somewhere else
+const env = require('./config/config');
 
 
 /** INIT THE SERVER */
@@ -31,7 +36,8 @@ app.use(logger('dev'));
 mongoose.connect('mongodb://localhost:27017/MyRecordStore', {       //27017 sieht man in mongo compass ind localhost; MyRecordStore oder irgendein anderer Name, ist Name der Datenbank
   useNewUrlParser: true,                        //die drei Zeilen kamen als Info im Terminal, wenn sie auskommentiert sind
   useCreateIndex: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  useFindAndModify: false
 });
 
 mongoose.connection.on(
@@ -46,12 +52,13 @@ mongoose.connection.on('open', () => {
 //Anweisungen von hier: https://mongoosejs.com/docs/index.html
 
 
-/** REQUEST PARSERS */
-//runs every time           sind middleware functions
+/** REQUEST PARSERS */  
+//müssen standargmäßig da sein
+//runs every time           sind middleware functions; immer wenn use
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(setCors);           //wenn hier error, geht es trotzdem weiter; man braucht extra middleware function
+app.use(setCors);           //wenn hier error, geht es trotzdem weiter; man braucht extra middleware function; middleware function ; die haben wir geschrieben
 
 
 /** STATIC FILES */

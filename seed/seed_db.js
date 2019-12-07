@@ -1,6 +1,7 @@
 // mongoose-seed lets you populate and clear MongoDB documents with all the benefits of Mongoose validation
 // populate: lets you reference documents in other collections
 // console.log('I AM A SEED SCRIPT');
+// Seed.js was a part of the fjs project. Seed.js is an abstract JavaScript Constructor, that would fulfill the following requirements : s. npmjs.com
 
 const mongoose = require('mongoose');
 const faker = require('faker');
@@ -79,12 +80,14 @@ const Order = require('../models/Order');
                 password: faker.internet.password(),
                 birthday: faker.date.past(),
                 userName: faker.internet.userName(),
+                role: faker.random.arrayElement(['Admin', 'User']),
                 address: {
                     city: faker.address.city(),
                     street: faker.address.streetName()
                 }
             });
 
+            const token = user.generateAuthToken();
             return user.save();                     //save: Please save this; returns a promise
         });
 
@@ -97,6 +100,8 @@ const Order = require('../models/Order');
         console.log(e);
     }
 
+
+    console.log(`I am creating 20 fake records`);
 
     /** CREATE 20 FAKE RECORDS */
     const recordPromises = Array(20)
